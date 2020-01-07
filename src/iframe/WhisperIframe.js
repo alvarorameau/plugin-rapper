@@ -6,6 +6,13 @@ export default class WhisperIframe extends React.Component {
         bridge = null;
         watchdogTimeout = null;
 
+        constructor(props){
+            super(props);
+            this.state = {
+                key: (new Date()).getTime()
+            }
+        }
+
         invoke(method, ...args) {
             if (this.bridge === null) {
                 return Promise.reject("Iframe not ready");
@@ -16,6 +23,7 @@ export default class WhisperIframe extends React.Component {
 
         componentDidMount() {
             this.bridge = new IframeBridge(this.iframe.contentWindow);
+
 
             this.bridge.exposeFunction('onReady', (response) => {
                 console.log('onReady', {response});
@@ -37,7 +45,10 @@ export default class WhisperIframe extends React.Component {
 
             this.bridge.exposeFunction('onDone', (response) => {
                 console.log('onDone', {response});
-
+                this.setState({
+                    key: (new Date()).getTime()
+                })
+                
                 return true;
             });
 
@@ -66,6 +77,8 @@ export default class WhisperIframe extends React.Component {
         }
 
         render() {
-            return <iframe ref={(iframe)=>{this.iframe = iframe}} src={this.props.src} title={this.props.src} />
+            const {key} = this.state;
+            
+            return <iframe ref={(iframe)=>{this.iframe = iframe}} src={this.props.src} title={this.props.src} key={key} />
         }
 }
